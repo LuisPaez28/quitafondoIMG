@@ -21,7 +21,7 @@ if uploaded_file is not None:
     
     with col1:
         st.header("Original")
-        st.image(image, use_container_width=True)
+        st.image(image, width='stretch')
 
     # 3. Procesamiento (La Magia)
     with col2:
@@ -41,7 +41,7 @@ if uploaded_file is not None:
                 # Convertir resultado a imagen para mostrar
                 output_image = Image.open(io.BytesIO(output_bytes))
                 
-                st.image(output_image, use_container_width=True)
+                st.image(output_image, width='stretch')
                 
                 # 4. Botón de Descarga
                 st.download_button(
