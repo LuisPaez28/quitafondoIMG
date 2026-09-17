@@ -9,7 +9,11 @@ st.set_page_config(page_title="QuitaFondo", page_icon="✨")
 st.title("Removedor de Fondos")
 st.write("Sube tu imagen para remover el fondo")
 
-# 2. El Widget de carga de archivos (Reemplaza al botón 'Seleccionar')
+# Inicializar el estado de sesión para guardar la imagen procesada
+if "output_bytes" not in st.session_state:
+    st.session_state.output_bytes = None
+
+# 2. El Widget de carga de archivos
 uploaded_file = st.file_uploader("Elige una imagen (JPG, PNG, WEBP)", type=["jpg", "jpeg", "png", "webp"])
 
 if uploaded_file is not None:
@@ -21,7 +25,7 @@ if uploaded_file is not None:
     
     with col1:
         st.header("Original")
-        st.image(image, width='stretch')
+        st.image(image, use_container_width=True)
 
     # 3. Procesamiento (La Magia)
     with col2:
@@ -35,18 +39,22 @@ if uploaded_file is not None:
                 image.save(buf, format="PNG")
                 byte_im = buf.getvalue()
                 
-                # Procesar con rembg
-                output_bytes = remove(byte_im)
-                
-                # Convertir resultado a imagen para mostrar
-                output_image = Image.open(io.BytesIO(output_bytes))
-                
-                st.image(output_image, width='stretch')
-                
-                # 4. Botón de Descarga
-                st.download_button(
-                    label="Descargar Imagen PNG",
-                    data=output_bytes,
-                    file_name="sin_fondo.png",
-                    mime="image/png"
-                )
+                # Procesar con rembg y guardar en el estado de la sesión
+                st.session_state.output_bytes = remove(byte_im)
+        
+        # 4. Mostrar y Descargar (Fuera del if del botón)
+        if st.session_state.output_bytes is not None:
+            # Convertir resultado a imagen para mostrar
+            output_image = Image.open(io.BytesIO(st.session_state.output_bytes))
+            st.image(output_image, use_container_width=True)
+            
+            # Botón de Descarga
+            st.download_button(
+                label="Descargar Imagen PNG",
+                data=st.session_state.output_bytes,
+                file_name="sin_fondo.png",
+                mime="image/png"
+            )
+else:
+    # Si el usuario cierra o cambia la imagen, limpiamos el estado
+    st.session_state.output_bytes = None
