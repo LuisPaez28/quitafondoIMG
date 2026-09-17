@@ -1,4 +1,4 @@
 rembg
 pillow
 streamlit
-onnxruntime-headless
+onnxruntime
